@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock MAVERICK / HEC</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f8f7f4;--bg3:#f2f0ec;
+  --text:#1a1a18;--text2:#6b6a65;--text3:#a8a7a2;
+  --border:rgba(0,0,0,.1);--border2:rgba(0,0,0,.18);
+  --radius:8px;--radius-lg:12px;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;color:var(--text);background:var(--bg3);min-height:100vh}
+.app{max-width:1120px;margin:0 auto;padding:0 16px 40px}
+.topbar{display:flex;align-items:center;gap:8px;padding:12px 0 14px;border-bottom:.5px solid var(--border);margin-bottom:16px;flex-wrap:wrap;background:var(--bg3);position:sticky;top:0;z-index:5}
+.topbar-title{font-size:15px;font-weight:700;flex:1;display:flex;align-items:center;gap:8px}
+.nav{display:flex;gap:3px;flex-wrap:wrap}
+.nav-btn{padding:5px 11px;border-radius:var(--radius);border:.5px solid var(--border2);font-size:12px;cursor:pointer;background:transparent;color:var(--text2);display:inline-flex;align-items:center;gap:4px;font-family:inherit;transition:all .15s}
+.nav-btn.active,.nav-btn:hover{background:var(--bg);color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.page{display:none}.page.active{display:block}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;margin-bottom:16px}
+.metric{background:var(--bg);border-radius:var(--radius-lg);padding:12px 14px;border:.5px solid var(--border)}
+.metric-label{font-size:11px;color:var(--text2);margin-bottom:3px}
+.metric-val{font-size:24px;font-weight:700}
+.card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:12px}
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.toolbar input,.toolbar select{font-size:13px;padding:6px 10px;border-radius:var(--radius);border:.5px solid var(--border2);background:var(--bg);color:var(--text);font-family:inherit;outline:none}
+.toolbar input{flex:1;min-width:140px}
+table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+th{text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;border-bottom:.5px solid var(--border);background:var(--bg2)}
+td{padding:8px 12px;border-bottom:.5px solid var(--border);vertical-align:middle;overflow:hidden;text-overflow:ellipsis}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg2)}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.b-out{background:#fcebeb;color:#791f1f}
+.b-in{background:#eaf3de;color:#27500a}
+.b-ok{background:#eaf3de;color:#27500a}
+.b-low{background:#faeeda;color:#633806}
+.b-crit{background:#a32d2d;color:#fff;animation:pulse 1.5s infinite}
+.b-zero{background:#f1efe8;color:#6b6a65}
+.b-pend{background:#faeeda;color:#633806}
+.b-recv{background:#eaf3de;color:#27500a}
+.b-na{background:#f1efe8;color:#9a9890}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.avatar{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg);border-radius:var(--radius-lg);border:.5px solid var(--border2);padding:22px;width:100%;max-width:520px;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.modal h3{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.form-row{margin-bottom:12px}
+.form-row label{display:block;font-size:12px;color:var(--text2);margin-bottom:4px;font-weight:600}
+.form-row input,.form-row select{width:100%;font-size:13px;padding:8px 10px;border-radius:var(--radius);border:.5px solid var(--border2);background:var(--bg);color:var(--text);font-family:inherit;outline:none}
+.form-row input:focus,.form-row select:focus{border-color:#378add;box-shadow:0 0 0 3px rgba(55,138,221,.1)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.btn-p{background:#185fa5;color:#fff;border:none;padding:8px 18px;border-radius:var(--radius);font-size:13px;cursor:pointer;font-weight:700;font-family:inherit}
+.btn-p:hover{background:#0c447c}
+.btn-s{background:#3b6d11;color:#fff;border:none;padding:8px 18px;border-radius:var(--radius);font-size:13px;cursor:pointer;font-weight:700;font-family:inherit}
+.btn-c{background:transparent;border:.5px solid var(--border2);padding:8px 14px;border-radius:var(--radius);font-size:13px;cursor:pointer;color:var(--text2);font-family:inherit}
+.btn-add{background:#185fa5;color:#fff;border:none;padding:6px 13px;border-radius:var(--radius);font-size:13px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:5px;font-family:inherit}
+.btn-add:hover{background:#0c447c}
+.btn-sm{padding:3px 8px;font-size:11px;border-radius:var(--radius);border:.5px solid var(--border2);cursor:pointer;background:transparent;color:var(--text2);font-family:inherit}
+.btn-sm:hover{background:var(--bg2)}
+.btn-sm-g{padding:3px 8px;font-size:11px;border-radius:var(--radius);border:.5px solid #3b6d11;cursor:pointer;background:#eaf3de;color:#27500a;font-family:inherit;font-weight:700}
+.btn-sm-r{padding:3px 8px;font-size:11px;border-radius:var(--radius);border:.5px solid #a32d2d;cursor:pointer;background:#fcebeb;color:#791f1f;font-family:inherit}
+.section-lbl{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px}
+.bar-wrap{width:70px;height:5px;background:var(--bg2);border-radius:3px;display:inline-block;vertical-align:middle;margin-right:6px}
+.bar{height:5px;border-radius:3px}
+.empty{color:var(--text3);font-size:13px;padding:24px;text-align:center}
+.subtabs{display:flex;margin-bottom:12px;border:.5px solid var(--border2);border-radius:var(--radius);overflow:hidden;width:fit-content}
+.stab{padding:5px 14px;font-size:13px;cursor:pointer;background:transparent;border:none;color:var(--text2);border-right:.5px solid var(--border2);font-family:inherit}
+.stab:last-child{border-right:none}
+.stab.active{background:var(--bg);color:var(--text);font-weight:700}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle}
+.dot-p{background:#ba7517}.dot-r{background:#1d9e75}
+.fchip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid var(--border);cursor:pointer;background:transparent;color:var(--text2);font-family:inherit}
+.cmd-item{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:.5px solid var(--border);font-size:13px}
+.cmd-item:last-child{border-bottom:none}
+.del-btn{cursor:pointer;color:var(--text3);font-size:16px;line-height:1}
+.del-btn:hover{color:#a32d2d}
+.sync-bar{display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 12px;border-radius:var(--radius);margin-bottom:12px}
+.sync-ok{background:#eaf3de;color:#27500a}
+.sync-err{background:#fcebeb;color:#791f1f}
+.sync-load{background:#e6f1fb;color:#0c447c}
+.alert-banner{border-radius:var(--radius-lg);padding:12px 16px;margin-bottom:12px;display:flex;align-items:flex-start;gap:12px;border:1.5px solid}
+.alert-crit{background:#fff5f5;border-color:#e24b4a}
+.alert-low{background:#fffbf2;border-color:#ef9f27}
+.alert-list span{display:inline-block;background:var(--bg2);border-radius:4px;padding:1px 6px;margin:2px;border:.5px solid var(--border);font-size:12px}
+.row-crit td{background:#fff5f5!important}.row-crit td:first-child{border-left:3px solid #e24b4a}
+.row-low td{background:#fffbf2!important}.row-low td:first-child{border-left:3px solid #ef9f27}
+.bell{display:inline-flex;align-items:center;gap:4px;background:#a32d2d;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;cursor:pointer;border:none;font-family:inherit;animation:pulse 1.5s infinite}
+.nbadge{display:inline-flex;align-items:center;justify-content:center;background:#e24b4a;color:#fff;font-size:10px;font-weight:700;min-width:15px;height:15px;border-radius:8px;padding:0 4px;margin-left:2px}
+.prod-img{width:44px;height:44px;object-fit:contain;border-radius:6px;border:.5px solid var(--border);background:var(--bg2);flex-shrink:0}
+.prod-img-ph{width:44px;height:44px;border-radius:6px;border:.5px dashed var(--border2);background:var(--bg2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:16px;flex-shrink:0;cursor:pointer}
+.img-prev{width:72px;height:72px;object-fit:contain;border-radius:8px;border:.5px solid var(--border);background:var(--bg2)}
+.img-prev-ph{width:72px;height:72px;border-radius:8px;border:.5px dashed var(--border2);background:var(--bg2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:24px;cursor:pointer;flex-shrink:0}
+.acmd-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:.5px solid var(--border)}
+.acmd-row:last-child{border-bottom:none}
+.acmd-img{width:36px;height:36px;object-fit:contain;border-radius:6px;border:.5px solid var(--border);background:var(--bg2);flex-shrink:0}
+.acmd-img-ph{width:36px;height:36px;border-radius:6px;border:.5px dashed var(--border2);background:var(--bg2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:14px;flex-shrink:0}
+.acmd-qty{width:65px;font-size:13px;padding:4px 7px;border-radius:var(--radius);border:.5px solid var(--border2);background:var(--bg);color:var(--text);font-family:inherit;text-align:center}
+.soc-card{flex:1;min-width:200px;cursor:pointer;background:var(--bg);border-radius:var(--radius-lg);padding:16px;transition:all .15s;border:2px solid var(--border)}
+.four-link{text-decoration:none}
+.four-card{background:var(--bg2);border-radius:var(--radius-lg);padding:12px 14px;display:flex;align-items:center;gap:10px;transition:all .15s;border:1.5px solid transparent}
+.cat-sep{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);padding:7px 12px;background:var(--bg2);border-bottom:.5px solid var(--border)}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.dash-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="topbar">
+  <div class="topbar-title"><i class="ti ti-package" style="font-size:19px;color:var(--text2)"></i> Stock MAVERICK / HEC</div>
+  <div id="sync-status" class="sync-bar sync-load"><i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Connexion...</div>
+  <button class="bell" id="alert-bell" onclick="goPage('acommander',document.querySelectorAll('.nav-btn')[3])" style="display:none"><i class="ti ti-bell"></i> <span id="bell-count">0</span></button>
+  <div class="nav">
+    <button class="nav-btn active" onclick="goPage('dashboard',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+    <button class="nav-btn" onclick="goPage('stock',this)"><i class="ti ti-box"></i> Stock</button>
+    <button class="nav-btn" onclick="goPage('mouvements',this)"><i class="ti ti-arrows-exchange"></i> Mouvements</button>
+    <button class="nav-btn" onclick="goPage('acommander',this)"><i class="ti ti-clipboard-list"></i> À commander <span id="acmd-badge" style="display:none;background:#e24b4a;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:2px">0</span></button>
+    <button class="nav-btn" onclick="goPage('commandes',this)"><i class="ti ti-truck"></i> Commandes</button>
+    <button class="nav-btn" onclick="goPage('tarifs',this)"><i class="ti ti-tag"></i> Tarifs</button>
+    <button class="nav-btn" onclick="goPage('portail',this)"><i class="ti ti-shopping-cart"></i> Portail</button>
+    <button class="nav-btn" onclick="goPage('techs',this)"><i class="ti ti-users"></i> Techniciens</button>
+    <button class="nav-btn" onclick="goPage('admin',this)" style="border-color:#a32d2d;color:#a32d2d"><i class="ti ti-settings"></i> Admin</button>
+  </div>
+</div>
+
+<div id="page-dashboard" class="page active">
+  <div id="dash-alerts"></div>
+  <div class="metrics" id="dash-metrics"></div>
+  <div class="dash-grid">
+    <div>
+      <div class="section-lbl">Derniers mouvements</div>
+      <div class="card"><table><thead><tr><th style="width:85px">Date</th><th>Produit</th><th style="width:80px">Par</th><th style="width:65px">Type</th></tr></thead><tbody id="dash-mvt-body"><tr><td colspan="4" class="empty">Chargement...</td></tr></tbody></table></div>
+    </div>
+    <div>
+      <div class="section-lbl">Commandes en cours</div>
+      <div class="card" id="dash-cmd-list" style="padding:12px"><div class="empty">Chargement...</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-stock" class="page">
+  <div class="toolbar">
+    <input type="text" id="stock-search" placeholder="Rechercher un produit..." oninput="renderStock()">
+    <select id="stock-cat" onchange="renderStock()"><option value="">Toutes catégories</option></select>
+    <button class="btn-add" onclick="openProdModal(null)"><i class="ti ti-plus"></i> Nouveau produit</button>
+  </div>
+  <div class="card"><table><thead><tr><th>Produit</th><th style="width:105px">Catégorie</th><th style="width:80px">Unité</th><th style="width:115px">Stock</th><th style="width:60px">Statut</th><th style="width:90px"></th></tr></thead><tbody id="stock-body"><tr><td colspan="6" class="empty">Chargement...</td></tr></tbody></table></div>
+</div>
+
+<div id="page-mouvements" class="page">
+  <div class="toolbar">
+    <input type="text" id="mvt-search" placeholder="Rechercher..." oninput="renderMvt()">
+    <select id="mvt-tech" onchange="renderMvt()"><option value="">Tous techniciens</option></select>
+    <select id="mvt-type" onchange="renderMvt()"><option value="">Tous types</option><option value="out">Sortie</option><option value="in">Entrée</option></select>
+    <select id="mvt-month" onchange="renderMvt()"><option value="">Tous mois</option></select>
+    <button class="btn-add" onclick="openMvtModal(null)"><i class="ti ti-plus"></i> Nouveau mouvement</button>
+  </div>
+  <div class="card"><table><thead><tr><th style="width:85px">Date</th><th>Produit</th><th style="width:115px">Par</th><th style="width:70px">Qté</th><th style="width:65px">Type</th><th>Note</th><th style="width:45px"></th></tr></thead><tbody id="mvt-body"><tr><td colspan="6" class="empty">Chargement...</td></tr></tbody></table></div>
+</div>
+
+<div id="page-acommander" class="page"><div id="acmd-content"></div></div>
+<div id="page-commandes" class="page">
+  <div class="toolbar">
+    <div class="subtabs">
+      <button class="stab active" onclick="switchCmd('pending',this)"><span class="dot dot-p"></span>En cours</button>
+      <button class="stab" onclick="switchCmd('received',this)"><span class="dot dot-r"></span>Reçues</button>
+      <button class="stab" onclick="switchCmd('all',this)">Toutes</button>
+    </div>
+    <div style="flex:1"></div>
+    <button class="btn-add" onclick="openCmdModal()"><i class="ti ti-plus"></i> Nouvelle commande</button>
+  </div>
+  <div id="cmd-list"></div>
+</div>
+
+<div id="page-tarifs" class="page">
+  <div class="toolbar">
+    <input type="text" id="tarif-search" placeholder="Rechercher..." oninput="renderTarifs()">
+    <div class="subtabs" style="margin-bottom:0">
+      <button class="stab active" onclick="switchTarif('all',this)">Tous</button>
+      <button class="stab" onclick="switchTarif('Dératisation',this)">Dératisation</button>
+      <button class="stab" onclick="switchTarif('Désinsectisation',this)">Désinsectisation</button>
+    </div>
+  </div>
+  <div class="card" style="overflow-x:auto" id="tarif-wrap"></div>
+</div>
+
+<div id="page-portail" class="page"><div id="portail-content"></div></div>
+<div id="page-techs" class="page">
+  <div class="toolbar"><button class="btn-add" onclick="openTechModal()"><i class="ti ti-plus"></i> Nouveau technicien</button></div>
+  <div id="techs-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px"></div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-prod"><div class="modal">
+  <h3 id="prod-title"><i class="ti ti-box"></i> Nouveau produit</h3>
+  <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px">
+    <div id="prod-img-wrap" class="img-prev-ph" onclick="document.getElementById('p-photo').select()"><i class="ti ti-photo"></i></div>
+    <div style="flex:1">
+      <div class="form-row" style="margin-bottom:8px"><label>Nom du produit</label><input type="text" id="p-name" placeholder="ex: Magnum Gel Cafards"></div>
+      <div class="form-row" style="margin-bottom:0"><label>URL photo</label><input type="text" id="p-photo" placeholder="https://..." oninput="previewPhoto()"></div>
+    </div>
+  </div>
+  <div class="form-grid">
+    <div class="form-row"><label>Catégorie</label><select id="p-cat"><option>Dératisation</option><option>Désinsectisation</option><option>Anti-pigeons</option><option>Désinfection</option><option>Autres</option></select></div>
+    <div class="form-row"><label>Unité</label><input type="text" id="p-unit" placeholder="unité, boite..."></div>
+  </div>
+  <div class="form-grid">
+    <div class="form-row"><label>Stock actuel</label><input type="number" id="p-stock" value="0" min="0" step="0.5"></div>
+    <div class="form-row"><label>Seuil alerte</label><input type="number" id="p-seuil" value="5" min="0"></div>
+  </div>
+  <div class="form-row"><label>Fournisseur principal</label><select id="p-four"><option value="">— Aucun —</option><option>Lodi</option><option>Liphatech</option><option>Aromsa</option><option>Mylva</option></select></div>
+  <div class="btn-row">
+    <button class="btn-c" onclick="closeModal('prod')">Annuler</button>
+    <button class="btn-p" onclick="saveProd()"><i class="ti ti-check"></i> <span id="prod-btn-lbl">Ajouter</span></button>
+  </div>
+</div></div>
+
+<div class="modal-overlay" id="modal-mvt"><div class="modal">
+  <h3><i class="ti ti-arrows-exchange"></i> Enregistrer un mouvement</h3>
+  <div class="form-grid">
+    <div class="form-row"><label>Date</label><input type="date" id="m-date"></div>
+    <div class="form-row"><label>Type</label><select id="m-type" onchange="toggleMvtType()"><option value="out">Sortie</option><option value="in">Entrée</option></select></div>
+  </div>
+  <div class="form-row"><label>Produit</label><select id="m-prod"></select></div>
+  <div id="m-tech-row" class="form-row"><label>Technicien</label><select id="m-tech"></select></div>
+  <div id="m-four-row" class="form-row" style="display:none"><label>Fournisseur</label>
+    <select id="m-four"><option>Lodi</option><option>Liphatech</option><option>Aromsa</option><option>Mylva</option><option>Autre</option></select>
+  </div>
+  <div class="form-grid">
+    <div class="form-row"><label>Quantité</label><input type="number" id="m-qty" value="1" min="0.1" step="0.1"></div>
+    <div class="form-row"><label>Note</label><input type="text" id="m-note" placeholder="ex: chantier Paris 8e"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn-c" onclick="closeModal('mvt')">Annuler</button>
+    <button class="btn-p" onclick="saveMvt()"><i class="ti ti-check"></i> Enregistrer</button>
+  </div>
+</div></div>
+
+<div class="modal-overlay" id="modal-tech"><div class="modal">
+  <h3><i class="ti ti-user-plus"></i> Nouveau technicien</h3>
+  <div class="form-row"><label>Nom</label><input type="text" id="t-name" placeholder="Prénom ou nom complet"></div>
+  <div class="btn-row">
+    <button class="btn-c" onclick="closeModal('tech')">Annuler</button>
+    <button class="btn-p" onclick="saveTech()"><i class="ti ti-check"></i> Ajouter</button>
+  </div>
+</div></div>
+
+<div class="modal-overlay" id="modal-cmd"><div class="modal">
+  <h3><i class="ti ti-truck"></i> Nouvelle commande fournisseur</h3>
+  <div class="form-row">
+    <label>Fournisseur</label>
+    <div id="f-chips" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"></div>
+    <input type="text" id="c-four-txt" placeholder="Ou saisir un autre fournisseur...">
+  </div>
+  <div class="form-grid">
+    <div class="form-row"><label>Date</label><input type="date" id="c-date"></div>
+    <div class="form-row"><label>Référence</label><input type="text" id="c-ref" placeholder="ex: BC2026-042"></div>
+  </div>
+  <div class="section-lbl">Produits commandés</div>
+  <div style="display:grid;grid-template-columns:1fr 70px auto;gap:6px;margin-bottom:8px;align-items:end">
+    <select id="c-prod-sel" style="font-size:13px;padding:7px 10px;border-radius:8px;border:.5px solid var(--border2);background:var(--bg);color:var(--text);font-family:inherit"></select>
+    <input type="number" id="c-prod-qty" value="1" min="1" style="font-size:13px;padding:7px 8px;border-radius:8px;border:.5px solid var(--border2);background:var(--bg);color:var(--text);font-family:inherit">
+    <button class="btn-p" style="padding:7px 12px" onclick="addCmdItem()"><i class="ti ti-plus"></i></button>
+  </div>
+  <div id="cmd-items-wrap" style="display:none;border:.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:6px"></div>
+  <div id="cmd-items-empty" style="font-size:12px;color:var(--text3)">Aucun produit ajouté</div>
+  <div class="btn-row">
+    <button class="btn-c" onclick="closeModal('cmd')">Annuler</button>
+    <button class="btn-p" onclick="saveCmd()"><i class="ti ti-send"></i> Enregistrer</button>
+  </div>
+</div></div>
+
+<div class="modal-overlay" id="modal-recv"><div class="modal">
+  <h3><i class="ti ti-circle-check"></i> Réceptionner la commande</h3>
+  <div id="recv-info" style="font-size:13px;color:var(--text2);margin-bottom:12px;padding:10px;background:var(--bg2);border-radius:var(--radius)"></div>
+  <div class="section-lbl">Quantités reçues</div>
+  <div id="recv-items"></div>
+  <div class="form-row" style="margin-top:12px"><label>Date de réception</label><input type="date" id="r-date"></div>
+  <div class="btn-row">
+    <button class="btn-c" onclick="closeModal('recv')">Annuler</button>
+    <button class="btn-s" onclick="confirmRecv()"><i class="ti ti-check"></i> Confirmer</button>
+  </div>
+</div></div>
+
+<div class="modal-overlay" id="modal-achat"><div class="modal">
+  <h3><i class="ti ti-receipt"></i> Saisir un achat</h3>
+  <div class="form-grid">
+    <div class="form-row"><label>Date</label><input type="date" id="a-date"></div>
+    <div class="form-row"><label>Fournisseur</label><select id="a-four"><option>Lodi</option><option>Liphatech</option><option>Aromsa</option><option>Mylva</option></select></div>
+  </div>
+  <div class="form-row"><label>Référence facture</label><input type="text" id="a-ref" placeholder="ex: FAC-2026-042"></div>
+  <div class="form-row"><label>Montant total HT €</label><input type="number" id="a-montant" min="0" step="0.01" placeholder="0.00"></div>
+  <div class="form-row"><label>Note</label><input type="text" id="a-note" placeholder="ex: commande mensuelle"></div>
+  <div class="btn-row">
+    <button class="btn-c" onclick="closeModal('achat')">Annuler</button>
+    <button class="btn-p" onclick="saveAchat()"><i class="ti ti-check"></i> Enregistrer</button>
+  </div>
+</div></div>
+
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// SUPABASE CONFIG
+// ══════════════════════════════════════════════════════════
+const SUPA_URL = 'https://hgoqehzknvfqslmmcmkf.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhnb3FlaHprbnZmcXNsbW1jbWtmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTc1ODYsImV4cCI6MjA5NTQzMzU4Nn0.LyH6Yul7iiieBGPCRb_I55lpHm8pSqGwDwFolsu9WiI';
+
+const headers = {
+  'Content-Type': 'application/json',
+  'apikey': SUPA_KEY,
+  'Authorization': 'Bearer ' + SUPA_KEY,
+  'Prefer': 'return=representation'
+};
+
+async function dbGet(table, params='') {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000); // 8s timeout
+  try {
+    const r = await fetch(SUPA_URL + '/rest/v1/' + table + '?order=id.asc' + (params?'&'+params:''), {
+      headers,
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  } catch(e) {
+    clearTimeout(timeout);
+    throw e;
+  }
+}
+async function dbInsert(table, data) {
+  const r = await fetch(SUPA_URL + '/rest/v1/' + table, {method:'POST', headers, body: JSON.stringify(data)});
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function dbUpdate(table, id, data) {
+  const r = await fetch(SUPA_URL + '/rest/v1/' + table + '?id=eq.' + id, {method:'PATCH', headers, body: JSON.stringify(data)});
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function dbDelete(table, id) {
+  const r = await fetch(SUPA_URL + '/rest/v1/' + table + '?id=eq.' + id, {method:'DELETE', headers});
+  if (!r.ok) throw new Error(await r.text());
+}
+
+function setSyncStatus(state, msg) {
+  const el = document.getElementById('sync-status');
+  el.className = 'sync-bar ' + (state==='ok'?'sync-ok':state==='err'?'sync-err':'sync-load');
+  el.innerHTML = '<i class="ti ti-' + (state==='ok'?'cloud-check':state==='err'?'cloud-off':'loader" style="animation:spin 1s linear infinite') + '"></i> ' + msg;
+}
+
+// ══════════════════════════════════════════════════════════
+// CONSTANTES
+// ══════════════════════════════════════════════════════════
+const FOURNISSEURS = ['Aromsa','Mylva','Liphatech','Lodi'];
+const FC = {
+  Aromsa:   {bg:'#eeedfe',txt:'#3c3489',border:'#534ab7'},
+  Mylva:    {bg:'#e1f5ee',txt:'#085041',border:'#0f6e56'},
+  Liphatech:{bg:'#faeeda',txt:'#633806',border:'#854f0b'},
+  Lodi:     {bg:'#faece7',txt:'#712b13',border:'#993c1d'},
+};
+const FOUR_URLS = {
+  Lodi:'https://lodi-hygiene.fr/mon-compte/',
+  Liphatech:'https://www.liphatech.fr/',
+  Aromsa:'https://www.aromsa.fr/',
+  Mylva:'https://www.mylva.fr/',
+};
+const FOUR_CONTACTS = {
+  Lodi:      { contact:'M. Negri',       email:'negri@lodi.fr',           info:'Envoyer un mail avec la liste des produits + quantités' },
+  Aromsa:    { contact:'Ingrid Caffin',  email:'ingrid.caffin@armosa.eu', info:'Envoyer un mail avec la liste des produits + quantités' },
+  Mylva:     { contact:'Service commercial', email:'contact@mylva.fr',    info:'Envoyer un mail avec la liste des produits + quantités' },
+  Liphatech: { contact:'Service commercial', email:'',                    info:'Commander via bon de commande sur leur site liphatech.fr' },
+};
+const TC = [
+  {bg:'#e6f1fb',txt:'#0c447c'},{bg:'#e1f5ee',txt:'#085041'},
+  {bg:'#faece7',txt:'#712b13'},{bg:'#fbeaf0',txt:'#72243e'},{bg:'#eeedfe',txt:'#3c3489'},
+];
+const TARIFS = [
+  {nom:'Limaille de fer / Xcluder',cat:'Dératisation',prix:{Lodi:41.00,Liphatech:null,Aromsa:34.28,Mylva:null},rem:''},
+  {nom:'Boîte souris',cat:'Dératisation',prix:{Lodi:0.82,Liphatech:null,Aromsa:0.54,Mylva:null},rem:''},
+  {nom:'Boîte rats',cat:'Dératisation',prix:{Lodi:2.50,Liphatech:null,Aromsa:1.72,Mylva:null},rem:''},
+  {nom:'Talon Bloc 10kg',cat:'Dératisation',prix:{Lodi:87.20,Liphatech:65.41,Aromsa:89.83,Mylva:null},rem:''},
+  {nom:'Racumin',cat:'Dératisation',prix:{Lodi:413.52,Liphatech:null,Aromsa:417.24,Mylva:null},rem:'Lodi 6 flacons / Aromsa 12 flacons'},
+  {nom:'Pâte bleue 15kg',cat:'Dératisation',prix:{Lodi:88.50,Liphatech:134.32,Aromsa:84.33,Mylva:null},rem:''},
+  {nom:'Pâte rouge 10kg',cat:'Dératisation',prix:{Lodi:50.50,Liphatech:33.73,Aromsa:53.08,Mylva:null},rem:'Lodi/Aromsa : 0.005%'},
+  {nom:'Gel anti-blattes',cat:'Désinsectisation',prix:{Lodi:60.00,Liphatech:84.53,Aromsa:84.53,Mylva:61.60},rem:''},
+  {nom:'Gel anti-fourmis',cat:'Désinsectisation',prix:{Lodi:68.60,Liphatech:110.78,Aromsa:110.78,Mylva:null},rem:''},
+  {nom:'Dobol Fumigateur',cat:'Désinsectisation',prix:{Lodi:14.35,Liphatech:null,Aromsa:13.89,Mylva:null},rem:''},
+  {nom:'Aérosol puces/punaises 150ml',cat:'Désinsectisation',prix:{Lodi:60.96,Liphatech:null,Aromsa:60.60,Mylva:null},rem:''},
+  {nom:'Terre de diatomée',cat:'Désinsectisation',prix:{Lodi:107.40,Liphatech:null,Aromsa:93.72,Mylva:null},rem:''},
+  {nom:'Concentré insecticide',cat:'Désinsectisation',prix:{Lodi:81.78,Liphatech:null,Aromsa:56.07,Mylva:null},rem:''},
+  {nom:'Appât fourmis gel 10g',cat:'Désinsectisation',prix:{Lodi:440.40,Liphatech:null,Aromsa:176.16,Mylva:null},rem:''},
+  {nom:'Larvicide concentré 500ml',cat:'Désinsectisation',prix:{Lodi:62.71,Liphatech:null,Aromsa:55.62,Mylva:null},rem:''},
+  {nom:'Poudre guêpes/frelons 5kg',cat:'Désinsectisation',prix:{Lodi:46.90,Liphatech:null,Aromsa:60.00,Mylva:null},rem:''},
+  {nom:'Insecticide liquide 10L',cat:'Désinsectisation',prix:{Lodi:66.70,Liphatech:null,Aromsa:85.57,Mylva:null},rem:''},
+  {nom:'Punaises concentré NG 250ml',cat:'Désinsectisation',prix:{Lodi:237.00,Liphatech:null,Aromsa:null,Mylva:null},rem:''},
+  {nom:'AdKalis Xylophages 20L',cat:'Désinsectisation',prix:{Lodi:null,Liphatech:null,Aromsa:105.88,Mylva:null},rem:''},
+];
+const SOCIETES = [
+  {id:'maverick',nom:'MAVERICK',color:'#0c447c',bg:'#e6f1fb'},
+  {id:'hec',nom:'HEC',color:'#085041',bg:'#e1f5ee'},
+];
+
+// ══════════════════════════════════════════════════════════
+// STATE (chargé depuis Supabase)
+// ══════════════════════════════════════════════════════════
+let products = [], techs = [], mouvements = [], commandes = [], achats = [];
+let cmdFilter = 'pending', tarifFilter = 'all', portailSoc = 'maverick';
+let selectedF = null, cmdItems = [], editProdId = null, recvCmdId = null;
+
+// ══════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════
+function tc(t) { if(!t) return TC[0]; const i=techs.findIndex(x=>x.id===t.id); return TC[i>=0?i%TC.length:0]; }
+function fc(name) { return FC[name]||{bg:'#f1efe8',txt:'#6b6a65',border:'#aaa'}; }
+function ini(n) { return n.split(/[\s+]/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2); }
+function fmtDate(d) { if(!d) return '—'; const p=d.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+function fmtQ(q) { return q%1===0?q:parseFloat(q).toFixed(2); }
+function mKey(d) { const p=d.split('-'); return p[0]+'-'+p[1]; }
+function mLbl(k) { const[y,m]=k.split('-'); return ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'][+m-1]+' '+y; }
+function today() { return new Date().toISOString().slice(0,10); }
+function eur(v) { return v!=null?'€\u00a0'+v.toFixed(2):null; }
+function closeModal(id) { document.getElementById('modal-'+id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(el => { el.addEventListener('click', e => { if(e.target===el) el.classList.remove('open'); }); });
+
+// ══════════════════════════════════════════════════════════
+// CHARGEMENT INITIAL
+// ══════════════════════════════════════════════════════════
+// ── Cache local pour affichage instantané ─────────────────
+const CACHE_KEY = 'mh_cache_v1';
+const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
+function saveCache() {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      ts: Date.now(),
+      products, techs, mouvements, commandes, achats
+    }));
+  } catch(e) {}
+}
+
+function loadCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return false;
+    const c = JSON.parse(raw);
+    if (Date.now() - c.ts > CACHE_TTL) return false;
+    products   = c.products   || [];
+    techs      = c.techs      || [];
+    mouvements = c.mouvements || [];
+    commandes  = c.commandes  || [];
+    achats     = c.achats     || [];
+    return true;
+  } catch(e) { return false; }
+}
+
+async function loadAll() {
+  // 1. Cache d'abord — affichage IMMÉDIAT sans attendre Supabase
+  const hasCacheData = loadCache();
+  if (hasCacheData) {
+    renderDash();
+    updateBadges();
+    setSyncStatus('ok', 'Cache local ✓ — synchronisation...');
+  } else {
+    setSyncStatus('load', 'Première connexion...');
+  }
+
+  // 2. Sync Supabase en arrière-plan (ne bloque PAS l'affichage)
+  syncFromSupabase();
+}
+
+async function syncFromSupabase() {
+  try {
+    // Charger produits + techs en premier
+    [products, techs] = await Promise.all([
+      dbGet('products'),
+      dbGet('techs'),
+    ]);
+    renderDash();
+    updateBadges();
+
+    // Puis le reste
+    [mouvements, commandes, achats] = await Promise.all([
+      dbGet('mouvements','order=id.desc&limit=200'),
+      dbGet('commandes','order=id.desc'),
+      dbGet('achats','order=id.desc'),
+    ]);
+
+    saveCache();
+    renderDash();
+    updateBadges();
+    setSyncStatus('ok', 'Synchronisé ✓ — ' + new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}));
+  } catch(e) {
+    if (products.length > 0) {
+      setSyncStatus('err', '⚠ Hors ligne — cache affiché');
+    } else {
+      setSyncStatus('err', 'Connexion impossible — vérifiez Supabase');
+    }
+    console.error(e);
+  }
+}
+
+// Auto-refresh toutes les 3 minutes en arrière-plan
+setInterval(() => syncFromSupabase(), 3 * 60 * 1000);
+
+// ══════════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════════
+function goPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='dashboard')  renderDash();
+  if(name==='stock')      renderStock();
+  if(name==='mouvements') renderMvt();
+  if(name==='acommander') renderACmd();
+  if(name==='commandes')  renderCmd();
+  if(name==='tarifs')     renderTarifs();
+  if(name==='portail')    renderPortail();
+  if(name==='techs')      renderTechs();
+  if(name==='admin')      { renderAdminMvts(); }
+}
+
+// ══════════════════════════════════════════════════════════
+// BADGES / ALERTES
+// ══════════════════════════════════════════════════════════
+function getAlerts() {
+  return {
+    critical: products.filter(p=>p.stock<=0),
+    low: products.filter(p=>p.stock>0&&p.stock<=p.seuil)
+  };
+}
+function updateBadges() {
+  const {critical,low} = getAlerts();
+  const total = critical.length+low.length;
+  const bell = document.getElementById('alert-bell');
+  const badge = document.getElementById('acmd-badge');
+  document.getElementById('bell-count').textContent = total;
+  if(total>0) { bell.style.display='inline-flex'; badge.style.display='inline'; badge.textContent=total; }
+  else { bell.style.display='none'; badge.style.display='none'; }
+  document.querySelectorAll('.nbadge').forEach(b=>b.remove());
+  const pending = commandes.filter(c=>c.status==='pending').length;
+  if(pending>0) document.querySelectorAll('.nav-btn')[4].insertAdjacentHTML('beforeend','<span class="nbadge">'+pending+'</span>');
+}
+
+// ══════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════
+function renderDash() {
+  updateBadges();
+  const {critical,low} = getAlerts();
+  let alertHtml='';
+  if(critical.length) alertHtml+='<div class="alert-banner alert-crit"><span style="font-size:20px;color:#e24b4a;flex-shrink:0"><i class="ti ti-alert-circle"></i></span><div><div style="font-weight:700;color:#a32d2d;margin-bottom:4px">Stock ÉPUISÉ — '+critical.length+' produit'+(critical.length>1?'s':'')+'</div><div class="alert-list">'+critical.map(p=>'<span>'+p.name+'</span>').join('')+'</div></div></div>';
+  if(low.length) alertHtml+='<div class="alert-banner alert-low"><span style="font-size:20px;color:#ba7517;flex-shrink:0"><i class="ti ti-alert-triangle"></i></span><div><div style="font-weight:700;color:#854f0b;margin-bottom:4px">Stock bas — '+low.length+' produit'+(low.length>1?'s':'')+' sous le seuil</div><div class="alert-list">'+low.map(p=>'<span>'+p.name+' ('+fmtQ(p.stock)+')</span>').join('')+'</div></div></div>';
+  document.getElementById('dash-alerts').innerHTML=alertHtml;
+  const pending=commandes.filter(c=>c.status==='pending').length;
+  document.getElementById('dash-metrics').innerHTML=
+    '<div class="metric"><div class="metric-label">Produits</div><div class="metric-val">'+products.length+'</div></div>'+
+    '<div class="metric"><div class="metric-label">Mouvements</div><div class="metric-val">'+mouvements.length+'</div></div>'+
+    '<div class="metric"><div class="metric-label">Commandes en cours</div><div class="metric-val" style="color:#854f0b">'+pending+'</div></div>'+
+    '<div class="metric" style="border-color:'+(critical.length?'#e24b4a':low.length?'#ef9f27':'var(--border)')+'"><div class="metric-label">Alertes</div><div class="metric-val" style="color:'+(critical.length?'#a32d2d':low.length?'#854f0b':'inherit')+'">'+(critical.length+low.length)+'</div></div>';
+  const recent=mouvements.slice(0,7);
+  document.getElementById('dash-mvt-body').innerHTML=!recent.length?'<tr><td colspan="4" class="empty">Aucun mouvement</td></tr>':recent.map(m=>{
+    const p=products.find(x=>x.id===m.prod_id);
+    const t=m.tech_id?techs.find(x=>x.id===m.tech_id):null;
+    const c=tc(t);
+    const byHtml=t?'<span class="avatar" style="background:'+c.bg+';color:'+c.txt+'">'+ini(t.name)+'</span>':(m.fournisseur?'<span class="badge" style="background:'+fc(m.fournisseur).bg+';color:'+fc(m.fournisseur).txt+';font-size:10px">'+m.fournisseur+'</span>':'<i class="ti ti-building-store" style="color:var(--text3)"></i>');
+    return '<tr><td style="color:var(--text2)">'+fmtDate(m.date)+'</td><td style="overflow:hidden;text-overflow:ellipsis;max-width:0">'+(p?p.name:'—')+'</td><td>'+byHtml+'</td><td><span class="badge '+(m.type==='out'?'b-out':'b-in')+'">'+(m.type==='out'?'↓ Sortie':'↑ Entrée')+'</span></td></tr>';
+  }).join('');
+  const pCmds=commandes.filter(c=>c.status==='pending');
+  const dashCmd=document.getElementById('dash-cmd-list');
+  if(!pCmds.length){dashCmd.innerHTML='<div class="empty">Aucune commande</div>';return;}
+  dashCmd.innerHTML=pCmds.slice(0,5).map(cmd=>{
+    const c=fc(cmd.fournisseur);
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--border)">'+
+      '<div style="width:30px;height:30px;border-radius:50%;background:'+c.bg+';color:'+c.txt+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">'+ini(cmd.fournisseur)+'</div>'+
+      '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">'+cmd.fournisseur+'</div><div style="font-size:11px;color:var(--text2)">'+(cmd.items?cmd.items.length:0)+' produit'+(cmd.items&&cmd.items.length>1?'s':'')+' · '+fmtDate(cmd.date)+'</div></div>'+
+      '<button class="btn-sm-g" onclick="openRecvModal('+cmd.id+')"><i class="ti ti-circle-check"></i> Réceptionner</button></div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// STOCK
+// ══════════════════════════════════════════════════════════
+function renderStock() {
+  updateBadges();
+  const q=(document.getElementById('stock-search')||{value:''}).value.toLowerCase();
+  const c=(document.getElementById('stock-cat')||{value:''}).value;
+  const cats=[...new Set(products.map(p=>p.cat))];
+  document.getElementById('stock-cat').innerHTML='<option value="">Toutes catégories</option>'+cats.map(x=>'<option'+(c===x?' selected':'')+'>'+x+'</option>').join('');
+  const filtered=products.filter(p=>(!q||p.name.toLowerCase().includes(q))&&(!c||p.cat===c));
+  const maxRef=Math.max(...products.map(x=>x.seuil*4),1);
+  const tbody=document.getElementById('stock-body');
+  if(!filtered.length){tbody.innerHTML='<tr><td colspan="6" class="empty">Aucun produit</td></tr>';return;}
+  tbody.innerHTML=filtered.map(p=>{
+    const isCrit=p.stock<=0, isLow=p.stock>0&&p.stock<=p.seuil;
+    const barCol=isCrit?'#e24b4a':isLow?'#ef9f27':'#1d9e75';
+    const pct=isCrit?100:Math.min(100,Math.round(p.stock/maxRef*100));
+    const rowCls=isCrit?'row-crit':isLow?'row-low':'';
+    const badge=isCrit?'<span class="badge b-crit">⚠ Épuisé</span>':isLow?'<span class="badge b-low">↓ Bas</span>':'<span class="badge b-ok">✓ OK</span>';
+    const icon=isCrit?'<i class="ti ti-alert-circle" style="color:#e24b4a;margin-right:4px;vertical-align:-2px"></i>':isLow?'<i class="ti ti-alert-triangle" style="color:#ef9f27;margin-right:4px;vertical-align:-2px"></i>':'';
+    const imgHtml=p.photo?'<img src="'+p.photo+'" class="prod-img" onerror="this.style.display=\'none\'">':'<div class="prod-img-ph" onclick="openProdModal('+p.id+')" title="Ajouter photo"><i class="ti ti-photo" style="font-size:14px"></i></div>';
+    return '<tr class="'+rowCls+'">'+
+      '<td style="max-width:0"><div style="display:flex;align-items:center;gap:8px">'+imgHtml+'<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span style="font-weight:700">'+icon+p.name+'</span>'+(p.fournisseur?'<span style="font-size:10px;color:var(--text3);margin-left:6px">'+p.fournisseur+'</span>':'')+'</div></div></td>'+
+      '<td><span class="badge" style="background:var(--bg2);color:var(--text2)">'+p.cat+'</span></td>'+
+      '<td style="color:var(--text2)">'+p.unit+'</td>'+
+      '<td><div style="display:flex;align-items:center;gap:6px"><div class="bar-wrap"><div class="bar" style="width:'+pct+'%;background:'+barCol+';'+(isCrit?'animation:pulse 1.5s infinite':'')+'"></div></div><span style="font-weight:700;color:'+(isCrit?'#a32d2d':isLow?'#854f0b':'inherit')+'">'+fmtQ(p.stock)+'</span></div></td>'+
+      '<td>'+badge+'</td>'+
+      '<td style="white-space:nowrap"><button class="btn-sm" onclick="openMvtModal('+p.id+')" title="Mouvement"><i class="ti ti-arrows-exchange"></i></button> <button class="btn-sm" onclick="openProdModal('+p.id+')" title="Modifier"><i class="ti ti-edit"></i></button> <button class="btn-sm-r" onclick="deleteProd('+p.id+')" title="Supprimer"><i class="ti ti-trash"></i></button></td></tr>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// PRODUIT MODAL
+// ══════════════════════════════════════════════════════════
+function previewPhoto() {
+  const url=document.getElementById('p-photo').value.trim();
+  const wrap=document.getElementById('prod-img-wrap');
+  if(url) { wrap.outerHTML='<img id="prod-img-wrap" src="'+url+'" class="img-prev" onerror="this.outerHTML=\'<div id=\\\'prod-img-wrap\\\' class=\\\'img-prev-ph\\\'><i class=\\\'ti ti-photo\\\'></i></div>\'">'; }
+  else if(wrap.tagName==='IMG') { wrap.outerHTML='<div id="prod-img-wrap" class="img-prev-ph"><i class="ti ti-photo"></i></div>'; }
+}
+function openProdModal(id) {
+  editProdId=id;
+  const isEdit=id!=null;
+  document.getElementById('prod-title').innerHTML='<i class="ti ti-'+(isEdit?'edit':'box')+'"></i> '+(isEdit?'Modifier':'Nouveau')+' produit';
+  document.getElementById('prod-btn-lbl').textContent=isEdit?'Enregistrer':'Ajouter';
+  if(isEdit) {
+    const p=products.find(x=>x.id===id);
+    document.getElementById('p-name').value=p.name;
+    document.getElementById('p-cat').value=p.cat;
+    document.getElementById('p-unit').value=p.unit;
+    document.getElementById('p-stock').value=p.stock;
+    document.getElementById('p-seuil').value=p.seuil;
+    document.getElementById('p-photo').value=p.photo||'';
+    document.getElementById('p-four').value=p.fournisseur||'';
+    const wrap=document.getElementById('prod-img-wrap');
+    if(p.photo) wrap.outerHTML='<img id="prod-img-wrap" src="'+p.photo+'" class="img-prev">';
+    else if(wrap.tagName==='IMG') wrap.outerHTML='<div id="prod-img-wrap" class="img-prev-ph"><i class="ti ti-photo"></i></div>';
+  } else {
+    ['p-name','p-photo','p-unit'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('p-stock').value=0;
+    document.getElementById('p-seuil').value=5;
+    document.getElementById('p-four').value='';
+    const wrap=document.getElementById('prod-img-wrap');
+    if(wrap.tagName==='IMG') wrap.outerHTML='<div id="prod-img-wrap" class="img-prev-ph"><i class="ti ti-photo"></i></div>';
+  }
+  document.getElementById('modal-prod').classList.add('open');
+}
+async function saveProd() {
+  const name=document.getElementById('p-name').value.trim(); if(!name) return;
+  const data={name,cat:document.getElementById('p-cat').value,unit:document.getElementById('p-unit').value||'unité',stock:parseFloat(document.getElementById('p-stock').value)||0,seuil:parseFloat(document.getElementById('p-seuil').value)||5,photo:document.getElementById('p-photo').value.trim(),fournisseur:document.getElementById('p-four').value};
+  setSyncStatus('load','Sauvegarde...');
+  try {
+    if(editProdId!=null) {
+      const updated=await dbUpdate('products',editProdId,data);
+      const idx=products.findIndex(p=>p.id===editProdId);
+      if(idx>=0) products[idx]={...products[idx],...data};
+    } else {
+      const created=await dbInsert('products',data);
+      products.push(Array.isArray(created)?created[0]:created);
+    }
+    saveCache(); setSyncStatus('ok','Sauvegardé ✓');
+    closeModal('prod'); renderStock(); renderDash(); updateBadges();
+  } catch(e) { setSyncStatus('err','Erreur : '+e.message); }
+}
+
+// ══════════════════════════════════════════════════════════
+// MOUVEMENT
+// ══════════════════════════════════════════════════════════
+function toggleMvtType() {
+  const type=document.getElementById('m-type').value;
+  document.getElementById('m-tech-row').style.display=type==='out'?'':'none';
+  document.getElementById('m-four-row').style.display=type==='in'?'':'none';
+}
+function openMvtModal(prefillProdId) {
+  document.getElementById('m-prod').innerHTML=products.map(p=>'<option value="'+p.id+'">'+p.name+'</option>').join('');
+  document.getElementById('m-tech').innerHTML=techs.map(t=>'<option value="'+t.id+'">'+t.name+'</option>').join('');
+  document.getElementById('m-date').value=today();
+  document.getElementById('m-type').value='out';
+  document.getElementById('m-qty').value=1;
+  document.getElementById('m-note').value='';
+  toggleMvtType();
+  if(prefillProdId) document.getElementById('m-prod').value=prefillProdId;
+  document.getElementById('modal-mvt').classList.add('open');
+}
+async function saveMvt() {
+  const prod_id=parseInt(document.getElementById('m-prod').value);
+  const type=document.getElementById('m-type').value;
+  const tech_id=type==='out'?parseInt(document.getElementById('m-tech').value):null;
+  const fournisseur=type==='in'?document.getElementById('m-four').value:null;
+  const qty=parseFloat(document.getElementById('m-qty').value)||1;
+  const date=document.getElementById('m-date').value;
+  const note=document.getElementById('m-note').value.trim()||(fournisseur?'Réception '+fournisseur:'');
+  setSyncStatus('load','Sauvegarde...');
+  try {
+    const mvtData={date,prod_id,tech_id,fournisseur,qty,type,note};
+    const created=await dbInsert('mouvements',mvtData);
+    mouvements.unshift(Array.isArray(created)?created[0]:created);
+    // Update stock
+    const p=products.find(x=>x.id===prod_id);
+    if(p) {
+      p.stock=parseFloat((p.stock+(type==='in'?qty:-qty)).toFixed(3));
+      await dbUpdate('products',prod_id,{stock:p.stock});
+    }
+    saveCache(); setSyncStatus('ok','Sauvegardé ✓');
+    closeModal('mvt'); renderDash(); renderStock(); renderMvt(); updateBadges();
+  } catch(e) { setSyncStatus('err','Erreur : '+e.message); }
+}
+
+// ══════════════════════════════════════════════════════════
+// MOUVEMENTS PAGE
+// ══════════════════════════════════════════════════════════
+function renderMvt() {
+  const q=(document.getElementById('mvt-search')||{value:''}).value.toLowerCase();
+  const techF=(document.getElementById('mvt-tech')||{value:''}).value;
+  const typeF=(document.getElementById('mvt-type')||{value:''}).value;
+  const monthF=(document.getElementById('mvt-month')||{value:''}).value;
+  document.getElementById('mvt-tech').innerHTML='<option value="">Tous techniciens</option>'+techs.map(t=>'<option value="'+t.id+'"'+(techF==t.id?' selected':'')+'>'+t.name+'</option>').join('');
+  const months=[...new Set(mouvements.map(m=>mKey(m.date)))].sort().reverse();
+  document.getElementById('mvt-month').innerHTML='<option value="">Tous mois</option>'+months.map(k=>'<option value="'+k+'"'+(monthF===k?' selected':'')+'>'+mLbl(k)+'</option>').join('');
+  const filtered=mouvements.filter(m=>{
+    const p=products.find(x=>x.id===m.prod_id);
+    const t=m.tech_id?techs.find(x=>x.id===m.tech_id):null;
+    if(q&&!(p&&p.name.toLowerCase().includes(q))&&!(t&&t.name.toLowerCase().includes(q))&&!(m.note&&m.note.toLowerCase().includes(q))) return false;
+    if(techF&&m.tech_id!=techF) return false;
+    if(typeF&&m.type!==typeF) return false;
+    if(monthF&&mKey(m.date)!==monthF) return false;
+    return true;
+  });
+  const tbody=document.getElementById('mvt-body');
+  if(!filtered.length){tbody.innerHTML='<tr><td colspan="6" class="empty">Aucun mouvement</td></tr>';return;}
+  tbody.innerHTML=filtered.map(m=>{
+    const p=products.find(x=>x.id===m.prod_id);
+    const t=m.tech_id?techs.find(x=>x.id===m.tech_id):null;
+    const c=tc(t);
+    const byHtml=t?'<div style="display:flex;align-items:center;gap:6px"><span class="avatar" style="background:'+c.bg+';color:'+c.txt+'">'+ini(t.name)+'</span>'+t.name+'</div>':(m.fournisseur?'<span class="badge" style="background:'+fc(m.fournisseur).bg+';color:'+fc(m.fournisseur).txt+'"><i class="ti ti-building-store" style="font-size:11px;margin-right:3px;vertical-align:-1px"></i>'+m.fournisseur+'</span>':'<span style="font-size:11px;color:var(--text3)">—</span>');
+    return '<tr><td style="color:var(--text2)">'+fmtDate(m.date)+'</td><td style="overflow:hidden;text-overflow:ellipsis;max-width:0">'+(p?p.name:'—')+'</td><td>'+byHtml+'</td><td style="font-weight:700;color:'+(m.type==='out'?'#a32d2d':'#3b6d11')+'">'+(m.type==='out'?'−':'+')+fmtQ(m.qty)+'</td><td><span class="badge '+(m.type==='out'?'b-out':'b-in')+'">'+(m.type==='out'?'Sortie':'Entrée')+'</span></td><td style="color:var(--text2);overflow:hidden;text-overflow:ellipsis;max-width:0">'+(m.note||'')+'</td><td><button class="btn-sm-r" onclick="deleteMvt('+m.id+','+m.prod_id+','+m.qty+',\''+m.type+'\')" title="Supprimer"><i class="ti ti-trash"></i></button></td></tr>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// À COMMANDER
+// ══════════════════════════════════════════════════════════
+function renderACmd() {
+  updateBadges();
+  const sous=products.filter(p=>p.stock<=p.seuil).sort((a,b)=>a.stock-b.stock);
+  const el=document.getElementById('acmd-content');
+  if(!sous.length){el.innerHTML='<div class="card"><div class="empty" style="padding:40px"><i class="ti ti-circle-check" style="font-size:40px;color:#1d9e75;display:block;margin-bottom:10px"></i><div style="font-weight:700;font-size:15px;margin-bottom:4px">Tout est en stock !</div></div></div>';return;}
+  const byF={};
+  sous.forEach(p=>{const f=p.fournisseur||'Non défini';if(!byF[f])byF[f]=[];byF[f].push(p);});
+  let html='<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap"><div style="flex:1"><div style="font-size:15px;font-weight:700">'+sous.length+' produit'+(sous.length>1?'s':'')+' à commander</div></div><button class="btn-add" onclick="createFromList()"><i class="ti ti-send"></i> Créer les commandes</button></div>';
+  Object.entries(byF).forEach(([four,prods])=>{
+    const c=four!=='Non défini'?fc(four):{bg:'#f1efe8',txt:'#6b6a65',border:'#aaa'};
+    const url=FOUR_URLS[four];
+    html+='<div class="card" style="margin-bottom:12px"><div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:.5px solid var(--border)"><div style="width:34px;height:34px;border-radius:50%;background:'+c.bg+';color:'+c.txt+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">'+four.slice(0,2).toUpperCase()+'</div><div style="flex:1"><div style="font-weight:700">'+four+'</div><div style="font-size:11px;color:var(--text2)">'+prods.length+' produit'+(prods.length>1?'s':'')+' à réapprovisionner</div></div>'+(url?'<a href="'+url+'" target="_blank"><button class="btn-sm"><i class="ti ti-external-link"></i> Commander sur site</button></a>':'')+'<button class="btn-sm" onclick="chkAll(\''+four+'\',true)">Tout cocher</button><button class="btn-sm" onclick="chkAll(\''+four+'\',false)">Décocher</button></div>'+
+    prods.map(p=>{
+      const isCrit=p.stock<=0;
+      const sug=Math.max(Math.ceil(p.seuil*2-p.stock),1);
+      const imgHtml=p.photo?'<img src="'+p.photo+'" class="acmd-img" onerror="this.style.display=\'none\'">':'<div class="acmd-img-ph"><i class="ti ti-box"></i></div>';
+      return '<div class="acmd-row"><input type="checkbox" class="acmd-check" data-prod="'+p.id+'" data-four="'+four+'" checked style="width:16px;height:16px;accent-color:#185fa5;cursor:pointer;flex-shrink:0">'+imgHtml+'<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+p.name+'</div><div style="font-size:11px;color:'+(isCrit?'#a32d2d':'#854f0b')+'">'+(isCrit?'⚠ Épuisé':'↓ Bas')+' — stock : <strong>'+fmtQ(p.stock)+'</strong> '+p.unit+' / seuil : '+p.seuil+'</div></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span style="font-size:11px;color:var(--text2)">Qté :</span><input type="number" id="qty-'+p.id+'" value="'+sug+'" min="1" step="0.5" class="acmd-qty"><span style="font-size:11px;color:var(--text2)">'+p.unit+'</span></div></div>';
+    }).join('')+'</div>';
+  });
+  el.innerHTML=html;
+}
+function chkAll(four,state){document.querySelectorAll('.acmd-check[data-four="'+four+'"]').forEach(c=>c.checked=state);}
+async function createFromList() {
+  const checked=[...document.querySelectorAll('.acmd-check:checked')];
+  if(!checked.length){alert('Aucun produit sélectionné');return;}
+  const byF={};
+  checked.forEach(chk=>{const prodId=parseInt(chk.dataset.prod);const four=chk.dataset.four;const qty=parseFloat(document.getElementById('qty-'+prodId).value)||1;if(!byF[four])byF[four]=[];byF[four].push({prod_id:prodId,qty});});
+  setSyncStatus('load','Création des commandes...');
+  let count=0,skipped=false;
+  for(const[four,items] of Object.entries(byF)){
+    if(four==='Non défini'){skipped=true;continue;}
+    const data={fournisseur:four,date:today(),note:'Réapprovisionnement auto',items,status:'pending',date_reception:null};
+    const created=await dbInsert('commandes',data);
+    commandes.unshift(Array.isArray(created)?created[0]:created);
+    count++;
+  }
+  setSyncStatus('ok',count+' commande'+(count>1?'s':'')+' créée'+(count>1?'s':'')+'');
+  alert(count+' commande'+(count>1?'s':'')+' créée'+(count>1?'s':'')+'!'+(skipped?' (Produits sans fournisseur ignorés)':''));
+  goPage('commandes',document.querySelectorAll('.nav-btn')[4]);
+}
+
+// ══════════════════════════════════════════════════════════
+// COMMANDES
+// ══════════════════════════════════════════════════════════
+function switchCmd(filter,btn){cmdFilter=filter;document.querySelectorAll('#page-commandes .stab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderCmd();}
+function openCmdModal(){
+  cmdItems=[];selectedF=null;
+  document.getElementById('c-date').value=today();
+  document.getElementById('c-four-txt').value='';
+  document.getElementById('c-ref').value='';
+  document.getElementById('c-prod-qty').value=1;
+  document.getElementById('c-prod-sel').innerHTML=products.map(p=>'<option value="'+p.id+'">'+p.name+'</option>').join('');
+  renderFChips();renderCmdPreview();
+  document.getElementById('modal-cmd').classList.add('open');
+}
+function renderFChips(){document.getElementById('f-chips').innerHTML=FOURNISSEURS.map(f=>{const c=fc(f);const sel=selectedF===f;return '<button class="fchip" onclick="selF(\''+f+'\')" style="'+(sel?'background:'+c.bg+';color:'+c.txt+';border-color:'+c.border:'')+'"><i class="ti ti-building-store" style="font-size:12px"></i>'+f+'</button>';}).join('');}
+function selF(name){selectedF=name;document.getElementById('c-four-txt').value='';renderFChips();}
+function addCmdItem(){const prodId=parseInt(document.getElementById('c-prod-sel').value);const qty=parseFloat(document.getElementById('c-prod-qty').value)||1;const ex=cmdItems.find(i=>i.prod_id===prodId);if(ex)ex.qty+=qty;else cmdItems.push({prod_id:prodId,qty});renderCmdPreview();}
+function removeCmdItem(prodId){cmdItems=cmdItems.filter(i=>i.prod_id!==prodId);renderCmdPreview();}
+function renderCmdPreview(){const wrap=document.getElementById('cmd-items-wrap');const empty=document.getElementById('cmd-items-empty');if(!cmdItems.length){wrap.style.display='none';empty.style.display='block';return;}wrap.style.display='block';empty.style.display='none';wrap.innerHTML=cmdItems.map(item=>{const p=products.find(x=>x.id===item.prod_id);return '<div class="cmd-item"><span style="flex:1">'+(p?p.name:'—')+'</span><span style="font-size:12px;color:var(--text2);margin-right:8px">'+fmtQ(item.qty)+' '+(p?p.unit:'')+'</span><span class="del-btn" onclick="removeCmdItem('+item.prod_id+')"><i class="ti ti-x"></i></span></div>';}).join('');}
+async function saveCmd(){
+  const four=selectedF||document.getElementById('c-four-txt').value.trim();
+  if(!four){alert('Sélectionnez un fournisseur');return;}
+  if(!cmdItems.length){alert('Ajoutez au moins un produit');return;}
+  setSyncStatus('load','Sauvegarde...');
+  try{
+    const data={fournisseur:four,date:document.getElementById('c-date').value,note:document.getElementById('c-ref').value.trim(),items:cmdItems,status:'pending',date_reception:null};
+    const created=await dbInsert('commandes',data);
+    commandes.unshift(Array.isArray(created)?created[0]:created);
+    saveCache(); setSyncStatus('ok','Sauvegardé ✓');
+    closeModal('cmd');renderCmd();renderDash();updateBadges();
+  }catch(e){setSyncStatus('err','Erreur : '+e.message);}
+}
+function renderCmd(){
+  const filtered=cmdFilter==='pending'?commandes.filter(c=>c.status==='pending'):cmdFilter==='received'?commandes.filter(c=>c.status==='received'):commandes;
+  const el=document.getElementById('cmd-list');
+  if(!filtered.length){el.innerHTML='<div class="card"><div class="empty">'+(cmdFilter==='pending'?'Aucune commande en cours':cmdFilter==='received'?'Aucune commande reçue':'Aucune commande')+'</div></div>';return;}
+  el.innerHTML=filtered.map(cmd=>{
+    const c=fc(cmd.fournisseur);
+    const statusB=cmd.status==='pending'?'<span class="badge b-pend"><span class="dot dot-p"></span>En cours</span>':'<span class="badge b-recv"><span class="dot dot-r"></span>Reçue</span>';
+    const actionB=(cmd.status==='pending'?'<button class="btn-sm-g" onclick="openRecvModal('+cmd.id+')"><i class="ti ti-circle-check"></i> Réceptionner</button>':'<span style="font-size:12px;color:var(--text2)">Reçue le '+fmtDate(cmd.date_reception)+'</span>')+' <button class="btn-sm-r" onclick="deleteCmd('+cmd.id+')" title="Supprimer"><i class="ti ti-trash"></i></button>';
+    const items=(cmd.items||[]).map(item=>{const p=products.find(x=>x.id===item.prod_id);return '<div class="cmd-item" style="padding:6px 14px"><span style="flex:1">'+(p?p.name:'—')+'</span><span style="font-size:12px;color:var(--text2)">'+fmtQ(item.qty)+' '+(p?p.unit:'')+'</span></div>';}).join('');
+    const ct2=FOUR_CONTACTS[cmd.fournisseur];
+    const contactBand=ct2&&ct2.email?'<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:'+c.bg+'22;border-bottom:.5px solid var(--border)"><i class="ti ti-mail" style="color:'+c.txt+';font-size:14px;flex-shrink:0"></i><div style="flex:1;font-size:12px;color:var(--text2)">Contacter <strong>'+ct2.contact+'</strong> — <a href="mailto:'+ct2.email+'" style="color:'+c.txt+'">'+ct2.email+'</a></div><a href="mailto:'+ct2.email+'?subject=Commande+%E2%80%94+'+encodeURIComponent(cmd.fournisseur)+'&body=Bonjour+'+encodeURIComponent(ct2.contact||'')+'%2C%0A%0ASuite+%C3%A0+notre+commande+du+'+encodeURIComponent(fmtDate(cmd.date))+'%2C+voici+notre+liste+%3A%0A%0A'+encodeURIComponent((cmd.items||[]).map(i=>{const p=products.find(x=>x.id===i.prod_id);return (p?p.name:'?')+' — '+fmtQ(i.qty)+' '+(p?p.unit:'');}).join('\n'))+'%0A%0ACordialement" style="text-decoration:none"><button class="btn-sm" style="background:'+c.bg+';color:'+c.txt+';border-color:'+c.border+';white-space:nowrap;flex-shrink:0"><i class="ti ti-mail"></i> Envoyer mail</button></a></div>':'';
+    return '<div class="card"><div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:.5px solid var(--border)"><div style="width:36px;height:36px;border-radius:50%;background:'+c.bg+';color:'+c.txt+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">'+ini(cmd.fournisseur)+'</div><div style="flex:1;min-width:0"><div style="font-weight:700">'+cmd.fournisseur+'</div><div style="font-size:12px;color:var(--text2)">'+fmtDate(cmd.date)+(cmd.note?' · '+cmd.note:'')+'</div></div>'+statusB+'<div style="margin-left:8px;flex-shrink:0">'+actionB+'</div></div>'+contactBand+'<div style="font-size:12px;color:var(--text2);padding:5px 14px;border-bottom:.5px solid var(--border)">'+(cmd.items||[]).length+' produit'+(cmd.items&&cmd.items.length>1?'s':'')+' commandé'+(cmd.items&&cmd.items.length>1?'s':'')+'</div><div>'+items+'</div></div>';
+  }).join('');
+}
+function openRecvModal(cmdId){
+  const cmd=commandes.find(c=>c.id===cmdId);if(!cmd)return;
+  recvCmdId=cmdId;
+  document.getElementById('recv-info').innerHTML='<strong>'+cmd.fournisseur+'</strong> &nbsp;·&nbsp; '+fmtDate(cmd.date)+(cmd.note?'<br><em style="font-size:12px">'+cmd.note+'</em>':'');
+  document.getElementById('r-date').value=today();
+  document.getElementById('recv-items').innerHTML=(cmd.items||[]).map(item=>{const p=products.find(x=>x.id===item.prod_id);return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="flex:1;font-size:13px">'+(p?p.name:'—')+'</span><span style="font-size:11px;color:var(--text3)">cmd. '+fmtQ(item.qty)+'</span><input type="number" id="recv-'+item.prod_id+'" value="'+item.qty+'" min="0" step="0.5" style="width:72px;font-size:13px;padding:5px 8px;border-radius:var(--radius);border:.5px solid var(--border2);background:var(--bg);color:var(--text);font-family:inherit"><span style="font-size:12px;color:var(--text2);min-width:40px">'+(p?p.unit:'')+'</span></div>';}).join('');
+  document.getElementById('modal-recv').classList.add('open');
+}
+async function confirmRecv(){
+  const cmd=commandes.find(c=>c.id===recvCmdId);if(!cmd)return;
+  const dateR=document.getElementById('r-date').value||today();
+  setSyncStatus('load','Réception en cours...');
+  try{
+    for(const item of (cmd.items||[])){
+      const inp=document.getElementById('recv-'+item.prod_id);
+      const qty=parseFloat(inp?inp.value:item.qty)||0;
+      if(qty>0){
+        const p=products.find(x=>x.id===item.prod_id);
+        if(p){p.stock=parseFloat((p.stock+qty).toFixed(3));await dbUpdate('products',item.prod_id,{stock:p.stock});}
+        const mvt={date:dateR,prod_id:item.prod_id,tech_id:null,fournisseur:cmd.fournisseur,qty,type:'in',note:'Réception '+cmd.fournisseur};
+        const created=await dbInsert('mouvements',mvt);
+        mouvements.unshift(Array.isArray(created)?created[0]:created);
+      }
+    }
+    await dbUpdate('commandes',recvCmdId,{status:'received',date_reception:dateR});
+    cmd.status='received';cmd.date_reception=dateR;
+    saveCache(); setSyncStatus('ok','Réception confirmée ✓');
+    closeModal('recv');renderCmd();renderDash();renderStock();updateBadges();
+  }catch(e){setSyncStatus('err','Erreur : '+e.message);}
+}
+
+// ══════════════════════════════════════════════════════════
+// TARIFS
+// ══════════════════════════════════════════════════════════
+function switchTarif(f,btn){tarifFilter=f;document.querySelectorAll('#page-tarifs .stab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTarifs();}
+function renderTarifs(){
+  const q=(document.getElementById('tarif-search')||{value:''}).value.toLowerCase();
+  const cols=['Lodi','Liphatech','Aromsa','Mylva'];
+  const data=TARIFS.filter(t=>(!q||t.nom.toLowerCase().includes(q))&&(tarifFilter==='all'||t.cat===tarifFilter));
+  const wrap=document.getElementById('tarif-wrap');
+  if(!data.length){wrap.innerHTML='<div class="empty">Aucun produit</div>';return;}
+  const hdr=cols.map(f=>{const c=fc(f);return '<th style="width:95px;text-align:right;color:'+c.txt+';background:'+c.bg+'">'+f+'</th>';}).join('');
+  let html='<table style="table-layout:fixed;min-width:680px"><thead><tr><th>Produit</th>'+hdr+'<th style="width:80px;text-align:center">Meilleur</th><th style="width:130px">Remarque</th></tr></thead><tbody>';
+  let lastCat='';
+  data.forEach(t=>{
+    if(tarifFilter==='all'&&t.cat!==lastCat){lastCat=t.cat;html+='<tr><td colspan="7" class="cat-sep">'+t.cat+'</td></tr>';}
+    const valid=cols.map(f=>t.prix[f]).filter(p=>p!=null);
+    const minP=valid.length?Math.min(...valid):null;
+    const cells=cols.map(f=>{const p=t.prix[f];if(p==null)return '<td style="text-align:right"><span class="badge b-na">n.a.</span></td>';const best=p===minP&&valid.length>1;return '<td style="text-align:right;'+(best?'color:#27500a;font-weight:700;':'')+'">'+( best?'★ ':' ')+eur(p)+'</td>';}).join('');
+    const bests=valid.length?cols.filter(f=>t.prix[f]===minP):[];
+    const bestBadge=bests.map(f=>{const c=fc(f);return '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:'+c.bg+';color:'+c.txt+';display:inline-block;margin:1px">'+f+'</span>';}).join('');
+    html+='<tr><td style="font-weight:700;overflow:hidden;text-overflow:ellipsis">'+t.nom+'</td>'+cells+'<td style="text-align:center">'+(bestBadge||'<span class="badge b-na">—</span>')+'</td><td style="font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis">'+(t.rem||'')+'</td></tr>';
+  });
+  html+='</tbody></table>';
+  wrap.innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════════════
+// PORTAIL
+// ══════════════════════════════════════════════════════════
+function renderPortail(){
+  const stats={};
+  SOCIETES.forEach(s=>{const my=achats.filter(a=>a.soc===s.id);stats[s.id]={total:my.reduce((sum,a)=>sum+a.montant,0),count:my.length};});
+  const my=achats.filter(a=>a.soc===portailSoc);
+  const soc=SOCIETES.find(s=>s.id===portailSoc);
+  let html='<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">'+
+    SOCIETES.map(s=>'<div class="soc-card" onclick="portailSoc=\''+s.id+'\';renderPortail()" style="border-color:'+(portailSoc===s.id?s.color:'var(--border)')+'"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:38px;height:38px;border-radius:50%;background:'+s.bg+';color:'+s.color+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">'+s.nom.slice(0,2)+'</div><div><div style="font-weight:700;color:'+s.color+'">'+s.nom+'</div><div style="font-size:11px;color:var(--text2)">'+stats[s.id].count+' commande'+(stats[s.id].count>1?'s':'')+'</div></div>'+(portailSoc===s.id?'<div style="margin-left:auto;width:9px;height:9px;border-radius:50%;background:'+s.color+'"></div>':'')+'</div><div style="font-size:22px;font-weight:700;color:'+s.color+'">'+stats[s.id].total.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €</div><div style="font-size:11px;color:var(--text3)">Total dépensé HT</div></div>').join('')+'</div>';
+  html+='<div class="section-lbl"><i class="ti ti-external-link" style="margin-right:4px;vertical-align:-2px"></i>Commander chez nos fournisseurs</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:18px">'+FOURNISSEURS.map(f=>{const c=fc(f);const url=FOUR_URLS[f]||'#';return '<a class="four-link" href="'+url+'" target="_blank"><div class="four-card" style="color:'+c.txt+'"><div style="width:34px;height:34px;border-radius:50%;background:#fff;color:'+c.txt+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;border:1.5px solid '+c.border+'40">'+f.slice(0,2).toUpperCase()+'</div><div><div style="font-weight:700">'+f+'</div><div style="font-size:11px;opacity:.7">Espace pro</div></div><i class="ti ti-external-link" style="margin-left:auto;font-size:15px;opacity:.5"></i></div></a>';}).join('')+'</div>';
+  html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><div class="section-lbl" style="margin:0;flex:1">Historique — <span style="color:'+soc.color+'">'+soc.nom+'</span></div><button class="btn-add" onclick="document.getElementById(\'modal-achat\').classList.add(\'open\');document.getElementById(\'a-date\').value=today()"><i class="ti ti-plus"></i> Saisir un achat</button></div>';
+  if(!my.length){html+='<div class="card"><div class="empty">Aucun achat pour '+soc.nom+'</div></div>';}
+  else{
+    const total=my.reduce((s,a)=>s+a.montant,0);
+    html+='<div class="card" style="overflow-x:auto"><table style="table-layout:fixed;min-width:550px"><thead><tr><th style="width:85px">Date</th><th style="width:100px">Fournisseur</th><th>Note</th><th style="width:110px;text-align:right">Montant HT</th><th style="width:100px">Réf.</th><th style="width:50px"></th></tr></thead><tbody>'+
+      my.map(a=>{const c=fc(a.four||a.fournisseur);return '<tr><td style="color:var(--text2)">'+fmtDate(a.date)+'</td><td><span class="badge" style="background:'+c.bg+';color:'+c.txt+'">'+(a.four||a.fournisseur)+'</span></td><td style="overflow:hidden;text-overflow:ellipsis;max-width:0;font-size:12px;color:var(--text2)">'+(a.note||'—')+'</td><td style="text-align:right;font-weight:700;color:'+soc.color+'">'+a.montant.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €</td><td style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis">'+(a.ref||'—')+'</td><td><button class="btn-sm-r" onclick="delAchat('+a.id+')"><i class="ti ti-trash"></i></button></td></tr>';}).join('')+
+      '<tr style="background:var(--bg2)"><td colspan="3" style="font-weight:700;font-size:12px;color:var(--text2)">TOTAL '+soc.nom+'</td><td style="text-align:right;font-weight:700;font-size:15px;color:'+soc.color+'">'+total.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €</td><td colspan="2"></td></tr>'+
+      '</tbody></table></div>';
+  }
+  const byF={};FOURNISSEURS.forEach(f=>byF[f]=0);my.forEach(a=>{const k=a.four||a.fournisseur;if(byF[k]!==undefined)byF[k]+=a.montant;});
+  const max=Math.max(...Object.values(byF),1);
+  html+='<div class="section-lbl">Dépenses par fournisseur — '+soc.nom+'</div><div class="card" style="padding:14px">'+FOURNISSEURS.map(f=>{const c=fc(f);const pct=Math.round(byF[f]/max*100);return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><div style="width:75px;font-size:12px;font-weight:700;color:'+c.txt+';text-align:right">'+f+'</div><div style="flex:1;background:var(--bg2);border-radius:4px;height:22px;overflow:hidden"><div style="width:'+pct+'%;background:'+c.bg+';border:1px solid '+c.border+'30;height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px">'+(pct>15?'<span style="font-size:11px;font-weight:700;color:'+c.txt+'">'+byF[f].toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €</span>':'')+'</div></div>'+(pct<=15?'<div style="font-size:11px;font-weight:700;color:'+c.txt+';min-width:70px">'+byF[f].toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €</div>':'<div style="min-width:70px"></div>')+'</div>';}).join('')+'</div>';
+  document.getElementById('portail-content').innerHTML=html;
+}
+async function saveAchat(){
+  const montant=parseFloat(document.getElementById('a-montant').value);
+  if(!montant||montant<=0){alert('Saisissez un montant HT');return;}
+  const data={soc:portailSoc,four:document.getElementById('a-four').value,date:document.getElementById('a-date').value,montant,ref:document.getElementById('a-ref').value.trim(),note:document.getElementById('a-note').value.trim()};
+  setSyncStatus('load','Sauvegarde...');
+  try{const created=await dbInsert('achats',data);achats.unshift(Array.isArray(created)?created[0]:created);setSyncStatus('ok','Sauvegardé ✓');closeModal('achat');renderPortail();}
+  catch(e){setSyncStatus('err','Erreur : '+e.message);}
+}
+async function delAchat(id){
+  if(!confirm('Supprimer cet achat ?'))return;
+  setSyncStatus('load','Suppression...');
+  try{await dbDelete('achats',id);achats=achats.filter(a=>a.id!==id);setSyncStatus('ok','Supprimé ✓');renderPortail();}
+  catch(e){setSyncStatus('err','Erreur : '+e.message);}
+}
+
+// ══════════════════════════════════════════════════════════
+// TECHNICIENS
+// ══════════════════════════════════════════════════════════
+function openTechModal(){document.getElementById('t-name').value='';document.getElementById('modal-tech').classList.add('open');}
+async function saveTech(){
+  const name=document.getElementById('t-name').value.trim();if(!name)return;
+  setSyncStatus('load','Sauvegarde...');
+  try{const created=await dbInsert('techs',{name});techs.push(Array.isArray(created)?created[0]:created);setSyncStatus('ok','Sauvegardé ✓');closeModal('tech');renderTechs();}
+  catch(e){setSyncStatus('err','Erreur : '+e.message);}
+}
+function renderTechs(){
+  const mvtByTech={};
+  mouvements.forEach(m=>{if(m.tech_id){if(!mvtByTech[m.tech_id])mvtByTech[m.tech_id]=0;mvtByTech[m.tech_id]++;}});
+  document.getElementById('techs-grid').innerHTML=techs.map(t=>{
+    const c=tc(t);const count=mvtByTech[t.id]||0;
+    const last=mouvements.filter(m=>m.tech_id===t.id)[0];
+    return '<div class="card" style="padding:14px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div class="avatar" style="width:42px;height:42px;font-size:13px;background:'+c.bg+';color:'+c.txt+'">'+ini(t.name)+'</div><div><div style="font-weight:700;font-size:15px">'+t.name+'</div><div style="font-size:12px;color:var(--text2)">'+count+' mouvement'+(count>1?'s':'')+'</div></div></div>'+(last?'<div style="font-size:12px;color:var(--text2);margin-bottom:10px"><i class="ti ti-clock" style="font-size:13px;vertical-align:-2px;margin-right:4px"></i>Dernier : '+fmtDate(last.date)+'</div>':'<div style="font-size:12px;color:var(--text3);margin-bottom:10px">Aucun mouvement</div>')+'<button class="btn-sm" style="width:100%;text-align:center;padding:5px" onclick="filterByTech('+t.id+')"><i class="ti ti-arrows-exchange"></i> Voir ses mouvements</button></div>';
+  }).join('');
+}
+function filterByTech(techId){goPage('mouvements',document.querySelectorAll('.nav-btn')[2]);setTimeout(()=>{document.getElementById('mvt-tech').value=techId;renderMvt();},50);}
+
+
+// ══════════════════════════════════════════════════════════
+// SUPPRESSION D'ACTIONS
+// ══════════════════════════════════════════════════════════
+async function deleteMvt(id, prod_id, qty, type) {
+  if (!confirm('Supprimer ce mouvement ?\nLe stock sera automatiquement recalculé.')) return;
+  setSyncStatus('load', 'Suppression...');
+  try {
+    await dbDelete('mouvements', id);
+    mouvements = mouvements.filter(m => m.id !== id);
+    const p = products.find(x => x.id === prod_id);
+    if (p) {
+      p.stock = parseFloat((p.stock + (type === 'in' ? -qty : +qty)).toFixed(3));
+      await dbUpdate('products', prod_id, {stock: p.stock});
+    }
+    setSyncStatus('ok', 'Mouvement supprimé ✓');
+    renderMvt(); renderStock(); renderDash(); updateBadges();
+  } catch(e) { setSyncStatus('err', 'Erreur : ' + e.message); }
+}
+
+async function deleteCmd(id) {
+  if (!confirm('Supprimer cette commande ?')) return;
+  setSyncStatus('load', 'Suppression...');
+  try {
+    await dbDelete('commandes', id);
+    commandes = commandes.filter(c => c.id !== id);
+    setSyncStatus('ok', 'Commande supprimée ✓');
+    renderCmd(); renderDash(); updateBadges();
+  } catch(e) { setSyncStatus('err', 'Erreur : ' + e.message); }
+}
+
+async function deleteProd(id) {
+  if (!confirm('Supprimer ce produit ?\nCette action est irréversible.')) return;
+  setSyncStatus('load', 'Suppression...');
+  try {
+    await dbDelete('products', id);
+    products = products.filter(p => p.id !== id);
+    setSyncStatus('ok', 'Produit supprimé ✓');
+    renderStock(); renderDash(); updateBadges();
+  } catch(e) { setSyncStatus('err', 'Erreur : ' + e.message); }
+}
+
+
+// ══════════════════════════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════════════════════════
+function showAdminTab(name, btn) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.style.display='none');
+  document.querySelectorAll('#admin-tabs .stab').forEach(b => b.classList.remove('active'));
+  document.getElementById('admin-'+name).style.display='block';
+  btn.classList.add('active');
+  renderAdminTab(name);
+}
+
+function refreshAdmin() {
+  syncFromSupabase().then(() => {
+    const active = document.querySelector('#admin-tabs .stab.active');
+    if (active) active.click();
+    else renderAdminTab('mvts');
+  });
+}
+
+function renderAdminTab(name) {
+  if (name==='mvts')   renderAdminMvts();
+  if (name==='prods')  renderAdminProds();
+  if (name==='cmds')   renderAdminCmds();
+  if (name==='achats') renderAdminAchats();
+  if (name==='techs2') renderAdminTechs();
+}
+
+function renderAdminMvts() {
+  const tbody = document.getElementById('admin-mvt-body');
+  if (!mouvements.length) { tbody.innerHTML='<tr><td colspan="7" class="empty">Aucun mouvement</td></tr>'; return; }
+  tbody.innerHTML = mouvements.map(m => {
+    const p = products.find(x=>x.id===m.prod_id);
+    const t = m.tech_id ? techs.find(x=>x.id===m.tech_id) : null;
+    const by = t ? t.name : (m.fournisseur||'—');
+    return '<tr>'+
+      '<td style="color:var(--text2)">'+fmtDate(m.date)+'</td>'+
+      '<td style="overflow:hidden;text-overflow:ellipsis">'+(p?p.name:'ID:'+m.prod_id)+'</td>'+
+      '<td style="overflow:hidden;text-overflow:ellipsis">'+by+'</td>'+
+      '<td style="font-weight:700;color:'+(m.type==='out'?'#a32d2d':'#3b6d11')+'">'+(m.type==='out'?'−':'+')+fmtQ(m.qty)+'</td>'+
+      '<td><span class="badge '+(m.type==='out'?'b-out':'b-in')+'">'+(m.type==='out'?'Sortie':'Entrée')+'</span></td>'+
+      '<td style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis">'+(m.note||'')+'</td>'+
+      '<td><button class="btn-sm-r" onclick="adminDeleteMvt('+m.id+','+m.prod_id+','+m.qty+',\''+m.type+'\')"><i class="ti ti-trash"></i></button></td>'+
+      '</tr>';
+  }).join('');
+}
+
+function renderAdminProds() {
+  const tbody = document.getElementById('admin-prod-body');
+  tbody.innerHTML = products.map(p =>
+    '<tr>'+
+    '<td style="font-weight:600;overflow:hidden;text-overflow:ellipsis">'+p.name+'</td>'+
+    '<td><span class="badge" style="background:var(--bg2);color:var(--text2)">'+p.cat+'</span></td>'+
+    '<td style="font-weight:700">'+fmtQ(p.stock)+'</td>'+
+    '<td style="color:var(--text2)">'+p.seuil+'</td>'+
+    '<td style="color:var(--text2)">'+( p.fournisseur||'—')+'</td>'+
+    '<td><button class="btn-sm-r" onclick="adminDeleteProd('+p.id+')"><i class="ti ti-trash"></i></button></td>'+
+    '</tr>'
+  ).join('');
+}
+
+function renderAdminCmds() {
+  const tbody = document.getElementById('admin-cmd-body');
+  if (!commandes.length) { tbody.innerHTML='<tr><td colspan="5" class="empty">Aucune commande</td></tr>'; return; }
+  tbody.innerHTML = commandes.map(cmd => {
+    const c = fc(cmd.fournisseur);
+    return '<tr>'+
+      '<td style="color:var(--text2)">'+fmtDate(cmd.date)+'</td>'+
+      '<td><span class="badge" style="background:'+c.bg+';color:'+c.txt+'">'+cmd.fournisseur+'</span></td>'+
+      '<td style="overflow:hidden;text-overflow:ellipsis;font-size:12px;color:var(--text2)">'+(cmd.note||'—')+'</td>'+
+      '<td><span class="badge '+(cmd.status==='pending'?'b-pend':'b-recv')+'">'+(cmd.status==='pending'?'En cours':'Reçue')+'</span></td>'+
+      '<td><button class="btn-sm-r" onclick="adminDeleteCmd('+cmd.id+')"><i class="ti ti-trash"></i></button></td>'+
+      '</tr>';
+  }).join('');
+}
+
+function renderAdminAchats() {
+  const tbody = document.getElementById('admin-achat-body');
+  if (!achats.length) { tbody.innerHTML='<tr><td colspan="6" class="empty">Aucun achat</td></tr>'; return; }
+  tbody.innerHTML = achats.map(a => {
+    const c = fc(a.four||a.fournisseur||'');
+    const soc = SOCIETES.find(s=>s.id===a.soc);
+    return '<tr>'+
+      '<td style="color:var(--text2)">'+fmtDate(a.date)+'</td>'+
+      '<td><span class="badge" style="background:'+(soc?soc.bg:'var(--bg2)')+';color:'+(soc?soc.color:'var(--text2)')+'">'+( soc?soc.nom:a.soc||'—')+'</span></td>'+
+      '<td><span class="badge" style="background:'+c.bg+';color:'+c.txt+'">'+(a.four||a.fournisseur||'—')+'</span></td>'+
+      '<td style="text-align:right;font-weight:700">'+a.montant.toLocaleString('fr-FR',{minimumFractionDigits:2})+' €</td>'+
+      '<td style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis">'+(a.ref||'—')+'</td>'+
+      '<td><button class="btn-sm-r" onclick="adminDeleteAchat('+a.id+')"><i class="ti ti-trash"></i></button></td>'+
+      '</tr>';
+  }).join('');
+}
+
+function renderAdminTechs() {
+  const tbody = document.getElementById('admin-tech-body');
+  tbody.innerHTML = techs.map(t =>
+    '<tr>'+
+    '<td style="font-weight:600">'+t.name+'</td>'+
+    '<td><button class="btn-sm-r" onclick="adminDeleteTech('+t.id+')"><i class="ti ti-trash"></i></button></td>'+
+    '</tr>'
+  ).join('');
+}
+
+async function adminDeleteMvt(id, prod_id, qty, type) {
+  if (!confirm('Supprimer ce mouvement ?\nLe stock sera recalculé automatiquement.')) return;
+  setSyncStatus('load', 'Suppression...');
+  try {
+    await dbDelete('mouvements', id);
+    mouvements = mouvements.filter(m => m.id !== id);
+    const p = products.find(x => x.id === prod_id);
+    if (p) {
+      p.stock = parseFloat((p.stock + (type==='in' ? -qty : +qty)).toFixed(3));
+      await dbUpdate('products', prod_id, {stock: p.stock});
+    }
+    setSyncStatus('ok', 'Mouvement supprimé ✓');
+    renderAdminMvts(); renderDash(); renderStock(); updateBadges();
+  } catch(e) { setSyncStatus('err', 'Erreur : '+e.message); }
+}
+
+async function adminDeleteProd(id) {
+  if (!confirm('Supprimer ce produit ?\nAttention : irréversible.')) return;
+  setSyncStatus('load', 'Suppression...');
+  try {
+    await dbDelete('products', id);
+    products = products.filter(p => p.id !== id);
+    setSyncStatus('ok', 'Produit supprimé ✓');
+    renderAdminProds(); renderDash(); updateBadges();
+  } catch(e) { setSyncStatus('err', 'Erreur : '+e.message); }
+}
+
+async function adminDeleteCmd(id) {
+  if (!confirm('Supprimer cette commande ?')) return;
+  setSyncStatus('load', 'Suppression...');
+  try {
+    await dbDelete('commandes', id);
+    commandes = commandes.filter(c => c.id !== id);
+    setSyncStatus('ok', 'Commande supprimée ✓');
+    renderAdminCmds(); renderDash(); updateBadges();
+  } catch(e) { setSyncStatus('err', 'Erreur : '+e.message); }
+}
+
+async function adminDeleteAchat(id) {
+  if (!confirm('Supprimer cet achat ?')) return;
+  setSyncStatus('load', 'Suppression...');
+  try {
+    await dbDelete('achats', id);
+    achats = achats.filter(a => a.id !== id);
+    setSyncStatus('ok', 'Achat supprimé ✓');
+    renderAdminAchats(); renderPortail();
+  } catch(e) { setSyncStatus('err', 'Erreur : '+e.message); }
+}
+
+async function adminDeleteTech(id) {
+  if (!confirm('Supprimer ce technicien ?\nSes mouvements seront conservés.')) return;
+  setSyncStatus('load', 'Suppression...');
+  try {
+    await dbDelete('techs', id);
+    techs = techs.filter(t => t.id !== id);
+    setSyncStatus('ok', 'Technicien supprimé ✓');
+    renderAdminTechs(); renderTechs();
+  } catch(e) { setSyncStatus('err', 'Erreur : '+e.message); }
+}
+
+
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+loadAll();
+</script>
+
+<!-- ADMIN PAGE -->
+<div id="page-admin" class="page">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+    <div style="flex:1">
+      <div style="font-size:16px;font-weight:700">Administration</div>
+      <div style="font-size:12px;color:var(--text2)">Modifier ou supprimer n'importe quelle donnée directement</div>
+    </div>
+    <button class="btn-add" onclick="refreshAdmin()"><i class="ti ti-refresh"></i> Actualiser</button>
+  </div>
+
+  <div class="subtabs" id="admin-tabs">
+    <button class="stab active" onclick="showAdminTab('mvts',this)"><i class="ti ti-arrows-exchange"></i> Mouvements</button>
+    <button class="stab" onclick="showAdminTab('prods',this)"><i class="ti ti-box"></i> Produits</button>
+    <button class="stab" onclick="showAdminTab('cmds',this)"><i class="ti ti-truck"></i> Commandes</button>
+    <button class="stab" onclick="showAdminTab('achats',this)"><i class="ti ti-receipt"></i> Achats</button>
+    <button class="stab" onclick="showAdminTab('techs2',this)"><i class="ti ti-users"></i> Techniciens</button>
+  </div>
+
+  <!-- Mouvements -->
+  <div id="admin-mvts" class="admin-tab">
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px;padding:8px 12px;background:#fff5f5;border-radius:var(--radius);border:.5px solid #e24b4a">
+      <i class="ti ti-alert-triangle" style="color:#e24b4a;margin-right:4px"></i>
+      Supprimer un mouvement <strong>recalcule automatiquement le stock</strong> du produit concerné.
+    </div>
+    <div class="card" style="overflow-x:auto">
+      <table style="table-layout:fixed;min-width:650px">
+        <thead><tr><th style="width:90px">Date</th><th>Produit</th><th style="width:110px">Par</th><th style="width:65px">Qté</th><th style="width:65px">Type</th><th style="width:140px">Note</th><th style="width:50px"></th></tr></thead>
+        <tbody id="admin-mvt-body"><tr><td colspan="7" class="empty">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Produits -->
+  <div id="admin-prods" class="admin-tab" style="display:none">
+    <div class="card" style="overflow-x:auto">
+      <table style="table-layout:fixed;min-width:600px">
+        <thead><tr><th>Nom</th><th style="width:110px">Catégorie</th><th style="width:80px">Stock</th><th style="width:70px">Seuil</th><th style="width:100px">Fournisseur</th><th style="width:50px"></th></tr></thead>
+        <tbody id="admin-prod-body"><tr><td colspan="6" class="empty">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Commandes -->
+  <div id="admin-cmds" class="admin-tab" style="display:none">
+    <div class="card" style="overflow-x:auto">
+      <table style="table-layout:fixed;min-width:550px">
+        <thead><tr><th style="width:90px">Date</th><th style="width:110px">Fournisseur</th><th>Note</th><th style="width:90px">Statut</th><th style="width:50px"></th></tr></thead>
+        <tbody id="admin-cmd-body"><tr><td colspan="5" class="empty">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Achats -->
+  <div id="admin-achats" class="admin-tab" style="display:none">
+    <div class="card" style="overflow-x:auto">
+      <table style="table-layout:fixed;min-width:550px">
+        <thead><tr><th style="width:90px">Date</th><th style="width:100px">Société</th><th style="width:100px">Fournisseur</th><th style="width:100px;text-align:right">Montant HT</th><th style="width:100px">Réf.</th><th style="width:50px"></th></tr></thead>
+        <tbody id="admin-achat-body"><tr><td colspan="6" class="empty">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Techniciens -->
+  <div id="admin-techs2" class="admin-tab" style="display:none">
+    <div class="card">
+      <table>
+        <thead><tr><th>Nom</th><th style="width:50px"></th></tr></thead>
+        <tbody id="admin-tech-body"><tr><td colspan="2" class="empty">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+</body>
+</html>
